@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .error-icon {
+            display: none;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Tax Calculator</h1>
+        <form id="taxForm">
+            <div class="form-group">
+                <label for="grossIncome">Enter gross Annual Income:</label>
+                <input type="number" class="form-control" id="grossIncome" placeholder="Enter gross annual income">
+                <i class="error-icon fas fa-exclamation-circle"></i>
+            </div>
+            <div class="form-group">
+                <label for="extraIncome">Enter extra Income:</label>
+                <input type="number" class="form-control" id="extraIncome" placeholder="Enter extra income from other sources">
+                <i class="error-icon fas fa-exclamation-circle"></i>
+            </div>
+            <div class="form-group">
+                <label for="age">Enter age Group:</label>
+                <select class="form-control" id="age">
+                    <option value="">Select Age Group</option>
+                    <option value="<40">&lt; 40</option>
+                    <option value="≥40 & <60">&ge; 40 &lt; 60</option>
+                    <option value="≥60">&ge; 60</option>
+                </select>
+                <i class="error-icon fas fa-exclamation-circle"></i>
+            </div>
+            <div class="form-group">
+                <label for="deductions">Enter total applicable deductions:</label>
+                <input type="number" class="form-control" id="deductions" placeholder="Add total applicable deductions">
+                <i class="error-icon fas fa-exclamation-circle"></i>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <div class="modal fade" id="taxModal" tabindex="-1" role="dialog" aria-labelledby="taxModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taxModalLabel">Tax Calculation Result</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Your overall income will be <span id="taxAmount"></span> after tax deductions: </span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#taxForm').submit(function (e) {
+                e.preventDefault();
+                $('.error-icon').hide();
+                var grossIncome = parseFloat($('#grossIncome').val());
+                var extraIncome = parseFloat($('#extraIncome').val());
+                var age = $('#age').val();
+                var deductions = parseFloat($('#deductions').val());
+
+                if (isNaN(grossIncome) || grossIncome <= 0) {
+                    $('#grossIncome').next('.error-icon').show();
+                    return;
+                }
+                if (isNaN(extraIncome) || extraIncome < 0) {
+                    $('#extraIncome').next('.error-icon').show();
+                    return;
+                }
+                if (age === '') {
+                    $('#age').next('.error-icon').show();
+                    return;
+                }
+                if (isNaN(deductions) || deductions < 0) {
+                    $('#deductions').next('.error-icon').show();
+                    return;
+                }
+
+                var overallIncome = grossIncome + extraIncome - deductions;
+                var taxAmount = 0;
+
+                if (overallIncome > 800000) {
+                    if (age === '<40') {
+                        taxAmount = 0.3 * (overallIncome - 800000);
+                    } else if (age === '≥40 & <60') {
+                        taxAmount = 0.4 * (overallIncome - 800000);
+                    } else if (age === '≥60') {
+                        taxAmount = 0.1 * (overallIncome - 800000);
+                    }
+                }
+
+                $('#taxAmount').text(overallIncome > 800000 ? taxAmount.toFixed(2) + ' Lakhs' : '0 Lakhs');
+                $('#taxModal').modal('show');
+            });
+        });
+    </script>
+</body>
+</html>
